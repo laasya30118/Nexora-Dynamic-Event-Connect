@@ -1,0 +1,574 @@
+<!-- 
+CO1: Internet Fundamentals, HTML & Introductory CSS Styling
+
+Topics Covered:
+• Internet Fundamentals
+• HTTP / HTTPS Protocol
+• Web Client-Server Architecture
+• Browser Basics
+• Web Hosting & Domain Concepts
+• HTML Document Structure
+• Headings, Paragraphs, Links
+• CSS Syntax
+• Typography
+• Colors
+• Margin, Padding, Border
+-->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Nexora Dynamic Event Connect</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+/* 
+CO2: Comprehensive CSS Styling & Layout
+
+Topics Covered:
+• CSS Layout Design
+• Flexbox Layout
+• Responsive Styling
+• Color Gradients
+• Box Shadow
+• Card Layout Design
+*/
+
+/* BODY STYLE */
+
+body{
+margin:0;
+font-family:Segoe UI;
+background:linear-gradient(135deg,#f7f8ff,#e8f6ff);
+}
+
+/* LOGIN & REGISTER BOX */
+
+.container{
+width:380px;
+margin:80px auto;
+background:white;
+padding:30px;
+border-radius:12px;
+box-shadow:0 10px 20px rgba(0,0,0,0.1);
+}
+
+h2{
+text-align:center;
+color:#8e8dfc;
+}
+
+/* INPUT FIELDS */
+
+input,select{
+width:100%;
+padding:10px;
+margin:8px 0;
+border-radius:6px;
+border:1px solid #ddd;
+}
+
+/* BUTTON STYLE */
+
+button{
+width:100%;
+padding:10px;
+border:none;
+border-radius:6px;
+background:#b8e0d2;
+cursor:pointer;
+font-weight:bold;
+}
+
+button:hover{
+background:#ffd6e0;
+}
+
+/* LINK TEXT */
+
+.link{
+text-align:center;
+margin-top:10px;
+color:#8e8dfc;
+cursor:pointer;
+}
+
+/* NAVBAR */
+
+.navbar{
+background:#e9f1ff;
+padding:15px;
+margin:20px;
+border-radius:10px;
+display:flex;
+justify-content:space-between;
+}
+
+/* DASHBOARD CARDS */
+
+.cards{
+display:flex;
+gap:20px;
+margin:20px;
+}
+
+.card{
+flex:1;
+background:#ffe4f1;
+padding:20px;
+border-radius:10px;
+text-align:center;
+}
+
+/* SEARCH & FILTER */
+
+.controls{
+margin:20px;
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+
+/* EVENTS SECTION */
+
+.events{
+display:flex;
+flex-wrap:wrap;
+gap:15px;
+margin:20px;
+}
+
+.event{
+background:#e0f7fa;
+padding:15px;
+border-radius:10px;
+width:250px;
+}
+
+/* BOOKING HISTORY */
+
+.history{
+background:#fff3cd;
+margin:20px;
+padding:20px;
+border-radius:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- 
+CO3: HTML Forms & User Interaction
+
+Topics Covered:
+• HTML Form Elements
+• Input Fields
+• Password Fields
+• Buttons
+• Basic Form Design
+-->
+
+<!-- LOGIN PAGE -->
+
+<div class="container" id="loginBox">
+<h2>Login</h2>
+
+<input id="loginUser" placeholder="Username">
+<input type="password" id="loginPass" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+<div class="link" onclick="showRegister()">Create Account</div>
+</div>
+
+
+<!-- REGISTER PAGE -->
+
+<div class="container" id="registerBox" style="display:none;">
+<h2>Register</h2>
+
+<input id="regUser" placeholder="Username">
+<input type="password" id="regPass" placeholder="Password">
+
+<button onclick="register()">Register</button>
+
+<div class="link" onclick="showLogin()">Back to Login</div>
+</div>
+
+
+<!-- 
+CO4: Dynamic Web Pages using JavaScript
+
+Topics Covered:
+• DOM Manipulation
+• Event Handling
+• Dynamic Content Rendering
+• Interactive Web Applications
+-->
+
+<!-- DASHBOARD -->
+
+<div id="dashboard" style="display:none">
+
+<!-- NAVBAR -->
+
+<div class="navbar">
+<h3>Welcome, <span id="userDisplay"></span></h3>
+<button onclick="logout()" style="width:auto">Logout</button>
+</div>
+
+<!-- DASHBOARD STATS -->
+
+<div class="cards">
+
+<div class="card">
+<h4>Total Events</h4>
+<p id="totalEvents">0</p>
+</div>
+
+<div class="card">
+<h4>Total Bookings</h4>
+<p id="totalBookings">0</p>
+</div>
+
+</div>
+
+<!-- 
+CO5: Search & Filter System
+
+Topics Covered:
+• Event Search
+• Filtering by State & City
+• Dynamic Dropdown Menus
+-->
+
+<div class="controls">
+
+<input placeholder="Search Event" onkeyup="searchEvent(this.value)">
+
+<select id="stateFilter" onchange="updateCities();filterByLocation()">
+<option value="">State</option>
+</select>
+
+<select id="cityFilter" onchange="filterByLocation()">
+<option value="">City</option>
+</select>
+
+</div>
+
+
+<!-- 
+CO6: Event Management System
+
+Topics Covered:
+• Event Listing
+• Ticket Booking
+• Seat Availability
+• Dynamic Event Updates
+-->
+
+<div class="events" id="eventList"></div>
+
+
+<!-- 
+CO7: Booking History & User Activity
+
+Topics Covered:
+• Booking History Display
+• User Booking Tracking
+-->
+
+<div class="history">
+<h3>Booking History</h3>
+<ul id="historyList"></ul>
+</div>
+
+</div>
+
+
+<script>
+
+/* USER DATA */
+
+let users=[];
+let bookings=[];
+let currentUser="";
+
+
+/* STATES & CITIES */
+
+let stateCityData={
+Telangana:["Hyderabad","Warangal"],
+Karnataka:["Bangalore","Mysore"],
+"Tamil Nadu":["Chennai","Madurai"],
+Maharashtra:["Mumbai","Pune"],
+Delhi:["New Delhi"]
+};
+
+let stateFilter=document.getElementById("stateFilter");
+let cityFilter=document.getElementById("cityFilter");
+
+for(let s in stateCityData){
+let op=document.createElement("option");
+op.value=s;
+op.text=s;
+stateFilter.appendChild(op);
+}
+
+
+/* UPDATE CITIES */
+
+function updateCities(){
+
+cityFilter.innerHTML="<option value=''>City</option>";
+
+let state=stateFilter.value;
+
+if(stateCityData[state]){
+
+stateCityData[state].forEach(c=>{
+
+let op=document.createElement("option");
+op.value=c;
+op.text=c;
+cityFilter.appendChild(op);
+
+})
+
+}
+
+}
+
+
+/* FESTIVAL LIST */
+
+let festivalNames=[
+
+"Holi Festival",
+"Diwali Celebration",
+"Eid Celebration",
+"Christmas Carnival",
+"Navratri Garba Night",
+"Dussehra Cultural Fest",
+"Ganesh Chaturthi Celebration",
+"Durga Puja Festival",
+"Onam Flower Festival",
+"Pongal Harvest Festival",
+"Makar Sankranti Kite Festival",
+"Baisakhi Celebration",
+"Ugadi Cultural Fest",
+"Ramzan Food Festival",
+"New Year Music Festival",
+"Karva Chauth Celebration",
+"Lohri Bonfire Festival",
+"Rath Yatra Festival",
+"Janmashtami Celebration",
+"Mahashivratri Festival",
+"Gudi Padwa Festival",
+"Vishu Celebration",
+"Guru Nanak Jayanti",
+"Chhath Puja Festival",
+"Raksha Bandhan Celebration"
+
+];
+
+
+/* GENERATE EVENTS */
+
+let events=[];
+
+festivalNames.forEach(festival=>{
+
+for(let state in stateCityData){
+
+let cities=stateCityData[state];
+
+let randomCity=cities[Math.floor(Math.random()*cities.length)];
+
+events.push({
+
+name:festival,
+state:state,
+city:randomCity,
+venue:"Main Grounds",
+price:Math.floor(Math.random()*500)+300,
+date:"2026-03-08",
+start:"10:00 AM",
+end:"05:00 PM",
+seats:100,
+popularity:Math.floor(Math.random()*10)+1
+
+});
+
+}
+
+});
+
+
+/* REGISTER */
+
+function register(){
+
+users.push({user:regUser.value,pass:regPass.value});
+
+alert("Registered");
+
+showLogin();
+
+}
+
+
+/* LOGIN */
+
+function login(){
+
+let u=users.find(x=>x.user==loginUser.value && x.pass==loginPass.value);
+
+if(u){
+
+currentUser=u.user;
+
+userDisplay.innerText=currentUser;
+
+loginBox.style.display="none";
+
+dashboard.style.display="block";
+
+displayEvents(events);
+
+updateStats();
+
+}
+
+else alert("Invalid Login");
+
+}
+
+
+/* LOGOUT */
+
+function logout(){
+
+dashboard.style.display="none";
+
+loginBox.style.display="block";
+
+}
+
+
+/* DISPLAY EVENTS */
+
+function displayEvents(list){
+
+eventList.innerHTML="";
+
+list.forEach((e,i)=>{
+
+eventList.innerHTML+=`
+
+<div class="event">
+
+<h4>${e.name}</h4>
+<p>${e.state} - ${e.city}</p>
+<p>${e.venue}</p>
+<p>${e.date}</p>
+<p>₹${e.price}</p>
+<p>Seats: ${e.seats}</p>
+
+<button onclick="bookEvent(${i})">Book Ticket</button>
+
+</div>
+
+`
+
+})
+
+totalEvents.innerText=list.length;
+
+}
+
+
+/* BOOK EVENT */
+
+function bookEvent(i){
+
+if(events[i].seats>0){
+
+events[i].seats--;
+
+bookings.push(events[i].name);
+
+historyList.innerHTML+=`<li>${events[i].name}</li>`;
+
+updateStats();
+
+displayEvents(events);
+
+}
+
+}
+
+
+/* UPDATE STATS */
+
+function updateStats(){
+
+totalBookings.innerText=bookings.length;
+
+}
+
+
+/* SEARCH EVENT */
+
+function searchEvent(k){
+
+let f=events.filter(e=>
+
+e.name.toLowerCase().includes(k.toLowerCase())
+
+);
+
+displayEvents(f);
+
+}
+
+
+/* FILTER BY LOCATION */
+
+function filterByLocation(){
+
+let s=stateFilter.value;
+let c=cityFilter.value;
+
+let f=events.filter(e=>
+
+(s==""||e.state==s)&&
+(c==""||e.city==c)
+
+);
+
+displayEvents(f);
+
+}
+
+
+/* PAGE SWITCH */
+
+function showRegister(){
+loginBox.style.display="none";
+registerBox.style.display="block";
+}
+
+function showLogin(){
+registerBox.style.display="none";
+loginBox.style.display="block";
+}
+
+</script>
+
+</body>
+</html>
